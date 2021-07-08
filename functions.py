@@ -38,7 +38,7 @@ def get_endings_dataframe(data, only):
     return df
 
 ## For data options 1:5: Units data
-def get_units_data(data, only, watcher):
+def get_units_data(data, only):
     '''
     Build dataframe of unit data for further analysis.
     Adds "e" counter column for groupby in get_units function
@@ -63,7 +63,6 @@ def get_units_data(data, only, watcher):
         if only == True:
             participant = findParticipant(data['matches'][id], data['puuid'])
             temp_df = pd.json_normalize(participant['units'])
-            temp_df['summoner'] = data['summoner']
             temp_df['placement'] = participant['placement']
             temp_df['match_id'] = id
             df = df.append(temp_df)
@@ -72,14 +71,9 @@ def get_units_data(data, only, watcher):
             for j in range(8):
                 participant = data['matches'][id]['info']['participants'][j]
                 temp_df = pd.json_normalize(participant['units'])
-                temp_df['puuid'] = participant['puuid']
                 temp_df['placement'] = participant['placement']
                 temp_df['match_id'] = id
-                for puuid in temp_df['puuid']:
-                    sum = watcher.summoner.by_puuid('na1',puuid)['name']
-                    temp_df.loc[temp_df['puuid']==puuid,'summoner']=sum
                 df = df.append(temp_df)
-                df = df.drop('puuid', axis=1)
     ## Counter column
     df['e'] = 1
     return df

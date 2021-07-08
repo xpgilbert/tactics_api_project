@@ -100,18 +100,18 @@ def main():
             raw_data = st.checkbox('Show raw data', key='raw_data')
         show_data = st.button('Show Data')
         if show_data:
+            data = st.session_state.data
             ## End of Match Data
             if select == data_options[0]:
-                df = get_endings_dataframe(st.session_state.data, only)
+                df = get_endings_dataframe(data, only)
             ## Check if only interested in requested summoner
                 if only == True:
-                    df = df[df['puuid']==st.session_state.data['puuid']]
+                    df = df[df['puuid']==data['puuid']]
                 df = df.drop('puuid', axis=1)
                 st.write(df)
             ## Winning Units
             elif select == data_options[1]:
-                data = st.session_state.data
-                df = get_units_data(data,only,st.session_state.watcher)
+                df = get_units_data(data,only)
                 units = get_desired_units(df, n_units, how='win')
                 st.write(
                 'These are the top ' +
@@ -125,8 +125,7 @@ def main():
                     st.write(df.drop(['e', 'name'], axis=1))
             ## Losing Units
             elif select == data_options[2]:
-                data = st.session_state.data
-                df = get_units_data(data,only,st.session_state.watcher)
+                df = get_units_data(data,only)
                 units = get_desired_units(df, n_units, how='lose')
                 st.write(
                     'These are the worst ' +
@@ -140,8 +139,7 @@ def main():
                     st.write(df.drop(['e', 'name'], axis=1))
             ## First Place Units
             elif select == data_options[3]:
-                data = st.session_state.data
-                df = get_units_data(data,only,st.session_state.watcher)
+                df = get_units_data(data,only)
                 units = get_desired_units(df, n_units, how='first')
                 st.write(
                     'These are the ' +
@@ -155,8 +153,7 @@ def main():
                     st.write(df.drop(['e', 'name'], axis=1))
             ## Eighth Place Units
             elif select == data_options[4]:
-                data = st.session_state.data
-                df = get_units_data(data,only,st.session_state.watcher)
+                df = get_units_data(data,only)
                 units = get_desired_units(df, n_units, how='eighth')
                 st.write(
                     'These are the ' +
