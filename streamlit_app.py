@@ -22,7 +22,7 @@ def main():
         distribution of our placements.  Place make sure your api key
         exists in the directory above this python file in a file called
         *apikey.txt*.
-        * Libraries used: os, pandas, matplotlib, seaborn,
+        * Libraries used: os, pandas,
         [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/),
         [streamlit](https://streamlit.io/).
         * Riot API can be found [here](https://developer.riotgames.com/)
@@ -65,14 +65,7 @@ def main():
             watcher = riotwatcher.TftWatcher(api_key=get_api_key())
             if 'watcher' not in st.session_state:
                 st.session_state.watcher = watcher
-            pid, ids, ms = load_data(region, name, count, watcher)
-            data = {
-            'puuid':pid,
-            'summoner':name,
-            'region':region,
-            'match_ids':ids,
-            'matches':ms
-            }
+            data = load_data(region, name, count, watcher)
             st.session_state.data = data
             if type(len(st.session_state.data['match_ids']))==int:
                 st.write('Loaded '
@@ -104,10 +97,14 @@ def main():
             ## End of Match Data
             if select == data_options[0]:
                 df = get_endings_dataframe(data, only)
-            ## Check if only interested in requested summoner
-                if only == True:
-                    df = df[df['puuid']==data['puuid']]
-                df = df.drop('puuid', axis=1)
+                ## Get summoner names for only = False
+                if only == False:
+                    with st.spinner('Getting all summoners info'):
+                        watcher = riotwatcher.TftWatcher(api_key=get_api_key())
+                        for puuid in df['puuid']:
+                            sum = watcher.summoner.by_puuid(region, puuid)['name']
+                            df.loc[df['puuid']==puuid, 'summoner'] = sum
+                    df = df.drop('puuid', axis=1)
                 st.write(df)
             ## Winning Units
             elif select == data_options[1]:
@@ -165,18 +162,57 @@ def main():
                 if raw_data:
                     st.write('Raw Data:')
                     st.write(df.drop(['e', 'name'], axis=1))
+
+## load data function
 def load_data(region, name, count, watcher):
+    '''
+    Requests the data from Riot API using riotwatcher and creates a
+    dictionary of the relevant id information and match data to be used
+    as input to the custom functions throughout the app.
+
+    Parameters
+    ----------
+    region : str
+        dictionary of data pulled from initialized form
+    name : str
+        if only interested in the named summoner
+    count : int
+        number of matches to return
+    watcher : riotwatcher class, optional
+        watcher class from riotwatcher to interface Riot API
+    Returns
+    -------
+    data : dict
+        Dictionary of relevant data.
+        Key:Value pairs are:
+        puuid: player globally unique id
+        summoner: summoner name
+        region: summoner region
+        match_ids: list of match ids
+        matches: dictionary of match data with match_ids as keys
+    '''
+    ## Some Riot API needs platform, not region.  I dont know why
     if region == 'na1':
         platform = 'americas'
+    ## Find puuid for named summoner
     puuid = watcher.summoner.by_name(region, name)['puuid']
+    ## Get count sized match ids list
     match_ids = watcher.match.by_puuid(platform, puuid, count)
+    ## Loop over match_ids to pull match data
     matches = {}
-    st.write(match_ids)
     for i in range(len(match_ids)):
         if i % 2 == 0:
             st.write(i)
         matches[match_ids[i]]=watcher.match.by_id(platform,match_ids[i])
-    return puuid, match_ids, matches
+    ## Create dictionary to return
+    data = {
+    'puuid':puuid,
+    'summoner':name,
+    'region':region,
+    'match_ids':match_ids,
+    'matches':matches
+    }
+    return data
 
 def get_api_key():
     f = open('../apikey.txt', 'r')

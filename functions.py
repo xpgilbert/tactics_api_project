@@ -35,6 +35,10 @@ def get_endings_dataframe(data, only):
             ], axis=1, inplace=True)
         df = df.append(end_data)
         i +=1
+    ## Check if only interested in requested summoner
+    if only == True:
+        df = df[df['puuid']==data['puuid']]
+#        df = df.drop('puuid', axis=1)
     return df
 
 ## For data options 1:5: Units data
