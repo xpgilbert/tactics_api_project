@@ -151,6 +151,7 @@ def get_placements_by_units(data, count=3):
             score = win_score/lose_score
         group_by.loc[unit,'score'] = score
     units = group_by.sort_values(by='score', ascending=False)
+    units['num_games'] = units[list(group_by.columns[:-1])].sum(axis=1)
     return units
 
 def show_desired_units(how):
