@@ -167,60 +167,6 @@ def main():
                     st.write('Raw Data:')
                     st.write(df.drop(['e', 'name'], axis=1))
 
-## load data function
-def load_data(region, name, count, watcher):
-    '''
-    Requests the data from Riot API using riotwatcher and creates a
-    dictionary of the relevant id information and match data to be used
-    as input to the custom functions throughout the app.
-
-    Parameters
-    ----------
-    region : str
-        dictionary of data pulled from initialized form
-    name : str
-        if only interested in the named summoner
-    count : int
-        number of matches to return
-    watcher : riotwatcher class, optional
-        watcher class from riotwatcher to interface Riot API
-    Returns
-    -------
-    data : dict
-        Dictionary of relevant data.
-        Key:Value pairs are:
-        puuid: player globally unique id
-        summoner: summoner name
-        region: summoner region
-        match_ids: list of match ids
-        matches: dictionary of match data with match_ids as keys
-    '''
-    ## Some Riot API needs platform, not region.  I dont know why
-    if region == 'na1':
-        platform = 'americas'
-    ## Find puuid for named summoner
-    puuid = watcher.summoner.by_name(region, name)['puuid']
-    ## Get count sized match ids list
-    match_ids = watcher.match.by_puuid(platform, puuid, count)
-    ## Loop over match_ids to pull match data
-    matches = {}
-    for i in range(len(match_ids)):
-        if i % 2 == 0:
-            st.write(i)
-        matches[match_ids[i]]=watcher.match.by_id(platform,match_ids[i])
-    ## Create dictionary to return
-    data = {
-    'puuid':puuid,
-    'summoner':name,
-    'region':region,
-    'match_ids':match_ids,
-    'matches':matches
-    }
-    return data
-
-def get_api_key():
-    f = open('../apikey.txt', 'r')
-    return f.read()
-
+                    
 if __name__ == '__main__':
     main()
