@@ -43,7 +43,7 @@ def main():
                     f.write(apikey)
         apikey = 0
         st.stop()
-    ## Start page with only form to start riotwatcher Tftwatcher
+    ## Start page with only form to start riotwatcher.TftWatcher
     if 'submitted' not in st.session_state:
         st.session_state.submitted = False
     ## Initial fields
@@ -106,9 +106,13 @@ def main():
                         for puuid in df['puuid']:
                             sum = watcher.summoner.by_puuid(region, puuid)['name']
                             df.loc[df['puuid']==puuid, 'summoner'] = sum
-                    df = df.drop('puuid', axis=1)
                     if group:
                         df = df.sort_values(by='summoner')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['summoner', 'placement']]
+                    cols = ['summoner', 'placement'] + cols
+                    df = df[cols]
+                df = df.drop('puuid', axis=1)
                 st.write(df)
             ## Winning Units
             elif select == data_options[1]:
@@ -123,6 +127,10 @@ def main():
                 st.write(units)
                 if raw_data:
                     st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id','placement'] + cols
+                    df = df[cols]
                     st.write(df.drop(['e', 'name'], axis=1))
             ## Losing Units
             elif select == data_options[2]:
@@ -167,6 +175,6 @@ def main():
                     st.write('Raw Data:')
                     st.write(df.drop(['e', 'name'], axis=1))
 
-                    
+
 if __name__ == '__main__':
     main()
