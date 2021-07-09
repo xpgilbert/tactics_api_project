@@ -83,6 +83,8 @@ def main():
         select = st.selectbox('Select what data to show', data_options)
         only = st.selectbox('Only the desired summoner', ['Yes', 'No'])
         only = [True, False][['Yes', 'No'].index(only)]
+        if (select == data_options[0]) and (only == False):
+            group = st.checkbox('Sort by summoner')
         if select in data_options[1:5]:
             n_units = st.number_input(
                 'How many units',
@@ -105,6 +107,8 @@ def main():
                             sum = watcher.summoner.by_puuid(region, puuid)['name']
                             df.loc[df['puuid']==puuid, 'summoner'] = sum
                     df = df.drop('puuid', axis=1)
+                    if group:
+                        df = df.sort_values(by='summoner')
                 st.write(df)
             ## Winning Units
             elif select == data_options[1]:

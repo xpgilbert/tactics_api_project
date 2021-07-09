@@ -40,7 +40,6 @@ def get_endings_dataframe(data, only):
         df = df[df['puuid']==data['puuid']]
 #        df = df.drop('puuid', axis=1)
     return df
-
 ## For data options 1:5: Units data
 def get_units_data(data, only):
     '''
@@ -81,7 +80,6 @@ def get_units_data(data, only):
     ## Counter column
     df['e'] = 1
     return df
-
 def get_desired_units(data, count=3, how='win'):
     '''
     Get the units by desired filter method and return dataframe with
@@ -108,21 +106,17 @@ def get_desired_units(data, count=3, how='win'):
         how is win/lose, or placement count if first/eigth
 
     '''
-
     ## Group by unit and placement
     group_by=data.groupby(['character_id','placement']).count()['e'].unstack()
     group_by = group_by.fillna(0)
     undefeated = []
-
     if (any(x in [1,2,3,4] for x in (group_by.columns))==False) and (how=='win'):
         raise ValueError('There are no wins in this dataset')
     elif (any(x in [5,6,7,8] for x in (group_by.columns))==False) and (how=='lose'):
         raise ValueError('There are no losses in this dataset')
-
     ## Filter columns
     win_cols = [col for col in group_by.columns if col <=4]
     lose_cols = [col for col in group_by.columns if col > 4]
-
     ## Build weights based on available placements
     for unit in list(group_by.index):
         weights = []
@@ -147,19 +141,17 @@ def get_desired_units(data, count=3, how='win'):
             elif i == 8:
                 weights.append(4)
         lose_score=(group_by.loc[unit, lose_cols]*weights).sum()
-
-        ## Get undefeated units    and assign score to win score to avoid divide-by-zero error
+        ## Get undefeated units and assign score to win
+        ## score to avoid divide-by-zero error
         if lose_score == 0:
             undefeated.append(unit)
             score = win_score
         else:
             score = win_score/lose_score
         group_by.loc[unit,'score'] = score
-
     ## Print undefeated units
     if len(undefeated) != 0:
         st.write('These units did not lose a game:', undefeated)
-
     ## Filter accordingly
     if how == 'win':
         units = group_by.sort_values(by='score', ascending=False)[:count]
@@ -174,11 +166,67 @@ def get_desired_units(data, count=3, how='win'):
         units = group_by.loc[group_by[8] == group_by[8].max()]
         return units[[8]]
 
+## load data function
+def load_data(region, name, count, watcher):
+    '''
+    Requests the data from Riot API using riotwatcher and creates a
+    dictionary of the relevant id information and match data to be used
+    as input to the custom functions throughout the app.
+
+    Parameters
+    ----------
+    region : str
+        dictionary of data pulled from initialized form
+    name : str
+        if only interested in the named summoner
+    count : int
+        number of matches to return
+    watcher : riotwatcher class, optional
+        watcher class from riotwatcher to interface Riot API
+    Returns
+    -------
+    data : dict
+        Dictionary of relevant data.
+        Key:Value pairs are:
+        puuid: player globally unique id
+        summoner: summoner name
+        region: summoner region
+        match_ids: list of match ids
+        matches: dictionary of match data with match_ids as keys
+    '''
+    ## Some Riot API needs platform, not region.  I dont know why
+    if region == 'na1':
+        platform = 'americas'
+    ## Find puuid for named summoner
+    puuid = watcher.summoner.by_name(region, name)['puuid']
+    ## Get count sized match ids list
+    match_ids = watcher.match.by_puuid(platform, puuid, count)
+    ## Loop over match_ids to pull match data
+    matches = {}
+    for i in range(len(match_ids)):
+        if i % 2 == 0:
+            st.write(i)
+        matches[match_ids[i]]=watcher.match.by_id(platform,match_ids[i])
+    ## Create dictionary to return
+    data = {
+    'puuid':puuid,
+    'summoner':name,
+    'region':region,
+    'match_ids':match_ids,
+    'matches':matches
+    }
+    return data
+
+def get_api_key():
+    f = open('../apikey.txt', 'r')
+    return f.read()
+
+
+
 def findParticipant(match, puuid):
     '''
     function to find specific participant by puuid in a single match
     used in other function calls
-
     '''
     for i in range(8):
         participant = match['info']['participants'][i]
