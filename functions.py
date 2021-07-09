@@ -80,7 +80,8 @@ def get_units_data(data, only):
     ## Counter column
     df['e'] = 1
     return df
-def get_desired_units(data, count=3, how='win'):
+
+def get_placements_by_units(data, count=3):
     '''
     Get the units by desired filter method and return dataframe with
     appropriate column for comparison.
@@ -108,12 +109,12 @@ def get_desired_units(data, count=3, how='win'):
     '''
     ## Group by unit and placement
     group_by=data.groupby(['character_id','placement']).count()['e'].unstack()
-    group_by = group_by.fillna(0)
-    undefeated = []
-    if (any(x in [1,2,3,4] for x in (group_by.columns))==False) and (how=='win'):
-        raise ValueError('There are no wins in this dataset')
-    elif (any(x in [5,6,7,8] for x in (group_by.columns))==False) and (how=='lose'):
-        raise ValueError('There are no losses in this dataset')
+    group_by=group_by.fillna(0)
+    undefeated=[]
+    ##if (any(x in [1,2,3,4] for x in (group_by.columns))==False) and (how=='win'):
+    ##    raise ValueError('There are no wins in this dataset')
+    ##elif (any(x in [5,6,7,8] for x in (group_by.columns))==False) and (how=='lose'):
+    ##    raise ValueError('There are no losses in this dataset')
     ## Filter columns
     win_cols = [col for col in group_by.columns if col <=4]
     lose_cols = [col for col in group_by.columns if col > 4]
@@ -149,6 +150,10 @@ def get_desired_units(data, count=3, how='win'):
         else:
             score = win_score/lose_score
         group_by.loc[unit,'score'] = score
+    units = group_by.sort_values(by='score', ascending=False)
+    return units
+
+def show_desired_units(how):
     ## Print undefeated units
     if len(undefeated) != 0:
         st.write('These units did not lose a game:', undefeated)
@@ -217,11 +222,16 @@ def load_data(region, name, count, watcher):
     }
     return data
 
+def get_units_by_league(data, only):
+    return None
+
+
+
+
+
 def get_api_key():
     f = open('../apikey.txt', 'r')
     return f.read()
-
-
 
 def findParticipant(match, puuid):
     '''
