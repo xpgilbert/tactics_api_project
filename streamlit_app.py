@@ -145,6 +145,10 @@ def main():
                 st.write(units)
                 if raw_data:
                     st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id','placement'] + cols
+                    df = df[cols]
                     st.write(df.drop(['e', 'name'], axis=1))
             ## First Place Units
             elif select == data_options[3]:
@@ -159,6 +163,10 @@ def main():
                 st.write(units)
                 if raw_data:
                     st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id','placement'] + cols
+                    df = df[cols]
                     st.write(df.drop(['e', 'name'], axis=1))
             ## Eighth Place Units
             elif select == data_options[4]:
@@ -173,6 +181,10 @@ def main():
                 st.write(units)
                 if raw_data:
                     st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id','placement'] + cols
+                    df = df[cols]
                     st.write(df.drop(['e', 'name'], axis=1))
 
 
