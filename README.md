@@ -6,7 +6,7 @@ The potential product is being explored as a streamlit app using machine learnin
 
 
 ### Goals include:
-* to use machine learning to help players find their best and worst units
+* use machine learning to help players find their best and worst units
 * provide visualizations about placement distributions
 * find a good way to score unit performance in a match and over a sequence of matches
 
