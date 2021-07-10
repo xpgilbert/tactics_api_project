@@ -23,7 +23,7 @@ def main():
         distribution of our placements.  Place make sure your api key
         exists in the directory above this python file in a file called
         *apikey.txt*.
-        * Libraries used: os, pandas, json,
+        * Libraries used: os, pandas, json (developement only),
         [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/),
         [streamlit](https://streamlit.io/).
         * Riot API can be found [here](https://developer.riotgames.com/)
@@ -66,14 +66,16 @@ def by_summoner():
         region = st.selectbox(
             'Select region',
             ['na1', 'eu'],
-            key='region')
+            key='region'
+            )
         count = st.number_input(
             'Number of recent games',
             min_value=1,
             max_value=20,
             value=10,
-            key='count')
-        submit = st.form_submit_button('Request Data')
+            key='count'
+            )
+        submit = st.form_submit_button('Request Summoner Data')
         if submit:
             st.session_state.submitted = True
             watcher = riotwatcher.TftWatcher(api_key=get_api_key())
@@ -230,6 +232,12 @@ def by_league():
             ['na1', 'eu'],
             key='region'
             )
+        count = st.number_input(
+            'Number of recent games per summoner',
+            min_value=1,
+            max_value=20,
+            value=2
+            )
         queue = ['RANKED_TFT', 'RANKED_TFT_TURBO'][['Ranked', 'Hyper Roll'].index(queue)]
         submit = st.form_submit_button('Request League Data')
         if submit:
@@ -237,44 +245,27 @@ def by_league():
             watcher = riotwatcher.TftWatcher(api_key=get_api_key())
             if 'watcher' not in st.session_state:
                 st.session_state.watcher = watcher
-            data = load_league_data(region, name, watcher)
+            data = load_league_data(region, queue, name, count, watcher)
             st.session_state.data = data
             if type(len(st.session_state.data['match_ids']))==int:
                 st.write('Loaded '
-                    + str(len(st.session_state.data['summoners']))
-                    + ' summoners.')
+                    + str(len(st.session_state.data['matches']))
+                    + ' matches.')
+    ## Create JSON FILE
+    if st.session_state.data['leagueId']:
+        if st.button('Write json'):
+            with open('summoners_test.json', 'w') as outfile:
+                json.dump(st.session_state.data, outfile)
+    ## REMOVE THIS
+    data = {}
 
-
-
-        if submit:
-            sum_id = watcher.summoner.by_name(region, name)['id']
-            for league in watcher.league.by_summoner(region, sum_id):
-                if league['queueType'] == queue:
-                    league_id = league['leagueId']
-            league_data = watcher.league.by_id(region, league_id)
-            sum_ids = []
-            for entry in league_data['entries'][:10]:
-                sum_ids.append(entry['summonerId'])
-            # st.write(sum_ids)
-            summoners = {}
-            for id in sum_ids:
-                puuid = watcher.summoner.by_id(region, id)['puuid']
-                match_ids = watcher.match.by_puuid('americas', puuid, 2)
-                sum_matches = {}
-                for i in range(len(match_ids)):
-                    id = match_ids[i]
-                    temp_match = watcher.match.by_id('americas', id)
-                    sum_matches[id] = temp_match
-                summoners[puuid] = sum_matches
-            st.write('Loaded '+ str(len(summoners.keys())) + ' summoners.')
-            ## Create JSON FILE
-            if st.button('Write json'):
-                with open('summoners_test.json', 'w') as outfile:
-                    json.dump(summoners, outfile)
     ## For testing, load json file
-    with open('summoners_test.json') as f:
-        summoners = json.load(f)
-    st.write(summoners)
+    if st.button('Load json'):
+        with open('summoners_test.json') as f:
+            data = json.load(f)
+
+
+    st.write(data.keys())
 
 
 

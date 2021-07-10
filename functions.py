@@ -224,9 +224,48 @@ def load_summoner_data(region, name, count, watcher):
     }
     return data
 
-def get_units_by_league(data, only):
-    return None
-
+def load_league_data(region, queue, name, count, watcher):
+    ## Get encrypted summoner_id
+    sum_id = watcher.summoner.by_name(region, name)['id']
+    ## Get desired queue and coresponding league_id
+    for league in watcher.league.by_summoner(region, sum_id):
+        if league['queueType'] == queue:
+            league_id = league['leagueId']
+    ## Get League API data
+    league_data = watcher.league.by_id(region, league_id)
+    ## Get all summoner ids from league
+    sum_ids = []
+    for entry in league_data['entries'][:10]:
+        sum_ids.append(entry['summonerId'])
+    ## Get all matches per summoner
+    summoners = {}
+    for id in sum_ids:
+        puuid = watcher.summoner.by_id(region, id)['puuid']
+        match_ids = watcher.match.by_puuid('americas', puuid, count)
+        sum_matches = {}
+        for i in range(len(match_ids)):
+            id = match_ids[i]
+            temp_match = watcher.match.by_id('americas', id)
+            sum_matches[id] = temp_match
+        summoners[puuid] = sum_matches
+    ## Find all unique matches:
+    unique_ids = []
+    unique_matches = {}
+    for summoner in summoners.values():
+        for match in summoner.values():
+            match_id = match['metadata']['match_id']
+            if match_id not in unique_ids:
+                unique_ids.append(match_id)
+                unique_matches[match_id] = match
+    data = {
+        'leagueId':league_id,
+        'region':region,
+        'queue':queue,
+        'og_summoner_id':sum_id,
+        'match_ids':unique_ids,
+        'matches':unique_matches
+    }
+    return data
 
 
 
