@@ -7,7 +7,12 @@ if st.button('rewrite json'):
     watcher = riotwatcher.TftWatcher(api_key=get_api_key())
     region = 'na1'
     sum_id = watcher.summoner.by_name(region, 'ketelwon')['id']
-    league_id = watcher.league.by_summoner(region, sum_id)[1]['leagueId']
+    st.write('here', watcher.league.by_summoner(region, sum_id))
+    for league in watcher.league.by_summoner(region, sum_id):
+        if league['queueType'] == 'RANKED_TFT':
+            league_id = league['leagueId']
+
+    st.write('now here',league_id)
     league_data = watcher.league.by_id(region, league_id)
     sum_ids = []
     for entry in league_data['entries'][:10]:

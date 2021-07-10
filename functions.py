@@ -174,7 +174,7 @@ def score_units(data):
 #         return units[[8]]
 
 ## load data function
-def load_data(region, name, count, watcher):
+def load_summoner_data(region, name, count, watcher):
     '''
     Requests the data from Riot API using riotwatcher and creates a
     dictionary of the relevant id information and match data to be used
