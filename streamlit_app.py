@@ -17,7 +17,6 @@ from functions import *
 def main():
     st.title('TFT API Exercise')
     st.markdown('''
-
         This streamlit app helps tft players find their best and worst
         units. We can also request basic visualizations about the
         distribution of our placements.  Place make sure your api key
@@ -27,15 +26,14 @@ def main():
         [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/),
         [streamlit](https://streamlit.io/).
         * Riot API can be found [here](https://developer.riotgames.com/)
-
     ''')
     ## Check for apikey.txt file
     if not path.exists('../apikey.txt'):
         with st.form('apikey_file'):
             st.markdown('''
-                *You do not have apikey.txt file in the directory above
-                this app.  Please either use this widget to create one
-                or add it manually.  Then refresh this page.*
+                *You do not have an apikey.txt file in the directory
+                above this app.  Please either use this widget to create
+                one or add it manually.  Then refresh this page.*
             ''')
 
             apikey = st.text_input('Enter API Key', type = 'password')
@@ -44,6 +42,7 @@ def main():
                     f.write(apikey)
         apikey = 0
         st.stop()
+    ## Select from sideback
     explore_options = ['Summoner Data','League Data']
     exploring = st.sidebar.radio(
         label = 'What are we exploring today?',
@@ -53,8 +52,11 @@ def main():
         by_summoner()
     if exploring == explore_options[1]:
         by_league()
+########################################################################
+########################################################################
+########################################################################
 
-
+## By summoner
 def by_summoner():
     ## Start page with only form to start riotwatcher.TftWatcher
     if 'submitted' not in st.session_state:
@@ -206,7 +208,7 @@ def by_summoner():
                     ' units that placed eighth most often in the last ' +
                     str(count) +
                     ' games:')
-                st.write(units.sort_values(by='score', ascending=True)[:n_units][[8]])
+                st.write(units.loc[group_by[8] == group_by[8].max()][:n_units][[8]])
                 if raw_data:
                     st.write('Raw Data:')
                     cols = df.columns.tolist()
@@ -217,6 +219,7 @@ def by_summoner():
                     st.write('Placements by All Units: ')
                     st.write(units.sort_values(by='score', ascending=True))
 
+## By league
 def by_league():
     ## Start page with only form to start riotwatcher.TftWatcher
     if 'submitted' not in st.session_state:
@@ -251,23 +254,29 @@ def by_league():
                 st.write('Loaded '
                     + str(len(st.session_state.data['matches']))
                     + ' matches.')
+    ## Initialize st.session_state.data
+    if 'data' not in st.session_state:
+        st.session_state.data = {}
+
     ## Create JSON FILE
-    if st.session_state.data['leagueId']:
+    if 'leagueId' in st.session_state.data:
         if st.button('Write json'):
             with open('summoners_test.json', 'w') as outfile:
                 json.dump(st.session_state.data, outfile)
+
+#################################################
+    ## For testing, load json file
     ## REMOVE THIS
     data = {}
-
-    ## For testing, load json file
     if st.button('Load json'):
         with open('summoners_test.json') as f:
             data = json.load(f)
+        st.write(data)
+#################################################
 
 
-    st.write(data.keys())
-
-
-
+########################################################################
+########################################################################
+########################################################################
 if __name__ == '__main__':
     main()

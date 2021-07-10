@@ -183,7 +183,7 @@ def load_summoner_data(region, name, count, watcher):
     Parameters
     ----------
     region : str
-        dictionary of data pulled from initialized form
+        summoner region to query
     name : str
         if only interested in the named summoner
     count : int
@@ -225,6 +225,34 @@ def load_summoner_data(region, name, count, watcher):
     return data
 
 def load_league_data(region, queue, name, count, watcher):
+    '''
+    Requests the data from Riot API using riotwatcher and creates a
+    dictionary of the relevant id information and league data to be used
+    as input to the custom functions throughout the app.
+
+    Parameters
+    ----------
+    region : str
+        summoner region to query
+    queue : str
+        which game mode to query, either Ranked or Hyper Roll.
+    name : str
+        if only interested in the named summoner
+    count : int
+        number of matches per summoner to return
+    watcher : riotwatcher class, optional
+        watcher class from riotwatcher to interface Riot API
+    Returns
+    -------
+    data : dict
+        Dictionary of relevant data.
+        Key:Value pairs are:
+        leagueId: unique league id
+        region: summoner region
+        og_summoner_id: summoner id originally queued against
+        match_ids: list of unique match ids
+        matches: dictionary of unique match data with match_ids as keys
+    '''
     ## Get encrypted summoner_id
     sum_id = watcher.summoner.by_name(region, name)['id']
     ## Get desired queue and coresponding league_id
@@ -266,9 +294,6 @@ def load_league_data(region, queue, name, count, watcher):
         'matches':unique_matches
     }
     return data
-
-
-
 
 def get_api_key():
     f = open('../apikey.txt', 'r')

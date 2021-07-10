@@ -53,6 +53,5 @@ df = get_units_data(data, only=False)
 df = score_units(df)
 st.write(df)
 
-
 if st.button('show '):
     st.write('show something')
