@@ -249,7 +249,7 @@ def load_league_data(region, queue, name, count, watcher):
         Key:Value pairs are:
         leagueId: unique league id
         region: summoner region
-        og_summoner_id: summoner id originally queued against
+        summoner_id: summoner id originally queued against
         match_ids: list of unique match ids
         matches: dictionary of unique match data with match_ids as keys
     '''
@@ -261,6 +261,8 @@ def load_league_data(region, queue, name, count, watcher):
             league_id = league['leagueId']
     ## Get League API data
     league_data = watcher.league.by_id(region, league_id)
+    league_name = league_data['name']
+    league_tier = league_data['tier']
     ## Get all summoner ids from league
     sum_ids = []
     for entry in league_data['entries'][:10]:
@@ -287,9 +289,11 @@ def load_league_data(region, queue, name, count, watcher):
                 unique_matches[match_id] = match
     data = {
         'leagueId':league_id,
+        'name':league_name,
+        'tier':league_tier,
         'region':region,
         'queue':queue,
-        'og_summoner_id':sum_id,
+        'summoner_id':sum_id,
         'match_ids':unique_ids,
         'matches':unique_matches
     }

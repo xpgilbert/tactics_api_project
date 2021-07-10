@@ -264,6 +264,9 @@ def by_league():
             with open('summoners_test.json', 'w') as outfile:
                 json.dump(st.session_state.data, outfile)
 
+
+
+
 #################################################
     ## For testing, load json file
     ## REMOVE THIS
@@ -271,9 +274,49 @@ def by_league():
     if st.button('Load json'):
         with open('summoners_test.json') as f:
             data = json.load(f)
-        st.write(data)
+        st.session_state.submitted = True
 #################################################
-
+    ## Show desired data
+    if st.session_state.submitted:
+        data_options = [
+    #            'End of Match Data',
+            'Winning Units',
+            'Losing Units',
+            'First Place Units',
+            'Eighth Place Units'
+            ]
+        select = st.selectbox('Select what data to show', data_options)
+        show_data = st.button('Show Data')
+        if select in data_options:
+            n_units = st.number_input(
+                'How many units',
+                key='unit_count',
+                min_value=1,
+                max_value=10,
+                value=3)
+            raw_data = st.checkbox('Show raw data', key='raw_data')
+        if show_data:
+            data = st.session_state.data
+            ## Winning Units
+            if select == data_options[0]:
+                df = get_units_data(data,False)
+                units = score_units(df, n_units)
+                st.write(
+                'These are the top ' +
+                str(n_units) +
+                ' winning units from the last ' +
+                str(count) +
+                ' games:')
+                st.write(units[:n_units][['score']])
+                if raw_data:
+                    st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id'] + cols
+                    df = df[cols]
+                    st.write(df.drop(['e', 'name'], axis=1))
+                    st.write('Placements by All Units: ')
+                    st.write(units)
 
 ########################################################################
 ########################################################################
