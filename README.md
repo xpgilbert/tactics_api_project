@@ -4,7 +4,7 @@
 ## Exploration of Machine Learning, Analytics, and Visualizations Using the Riot API
 
 The potential product is being explored as a streamlit app using machine learning libraries to help players better understand their performance and update their strategies.  Intended for a small, personal audience.  You need to add your API key to a file called
-*apikey.txt* to the directory above this repository.
+*apikey.txt* to the directory above *streamlit_app.py*.
 
 
 ### Goals include:
