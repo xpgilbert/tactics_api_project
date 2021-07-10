@@ -117,7 +117,7 @@ def main():
             ## Winning Units
             elif select == data_options[1]:
                 df = get_units_data(data,only)
-                units = get_placements_by_units(df, n_units)
+                units = score_units(df, n_units)
                 st.write(
                 'These are the top ' +
                 str(n_units) +
@@ -137,7 +137,7 @@ def main():
             ## Losing Units
             elif select == data_options[2]:
                 df = get_units_data(data,only)
-                units = get_placements_by_units(df, n_units)
+                units = score_units(df, n_units)
                 st.write(
                     'These are the worst ' +
                     str(n_units) +
@@ -157,7 +157,7 @@ def main():
             ## First Place Units
             elif select == data_options[3]:
                 df = get_units_data(data,only)
-                units = get_placements_by_units(df, n_units)
+                units = score_units(df, n_units)
                 if 1 not in units.columns.tolist():
                     error = 'ERROR: no units got first place in this search'
                     return st.write(error)
@@ -180,7 +180,7 @@ def main():
             ## Eighth Place Units
             elif select == data_options[4]:
                 df = get_units_data(data,only)
-                units = get_placements_by_units(df, n_units)
+                units = score_units(df, n_units)
                 if 8 not in units.columns.tolist():
                     error = 'ERROR: no units got eighth place in this search'
                     return st.write(error)

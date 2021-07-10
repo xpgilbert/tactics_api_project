@@ -81,7 +81,7 @@ def get_units_data(data, only):
     df['e'] = 1
     return df
 
-def get_placements_by_units(data, count=3):
+def score_units(data):
     '''
     Get the units by desired filter method and return dataframe with
     appropriate column for comparison.
@@ -152,25 +152,26 @@ def get_placements_by_units(data, count=3):
         group_by.loc[unit,'score'] = score
     units = group_by.sort_values(by='score', ascending=False)
     units['num_games'] = units[list(group_by.columns[:-1])].sum(axis=1)
-    return units
-
-def show_desired_units(how):
     ## Print undefeated units
     if len(undefeated) != 0:
         st.write('These units did not lose a game:', undefeated)
-    ## Filter accordingly
-    if how == 'win':
-        units = group_by.sort_values(by='score', ascending=False)[:count]
-        return units[['score']]
-    elif how == 'first':
-        units = group_by[group_by[1] == group_by[1].max()]
-        return units[[1]]
-    elif how == 'lose':
-        units = group_by.sort_values(by='score', ascending=True)[:count]
-        return units[['score']]
-    elif how == 'eighth':
-        units = group_by.loc[group_by[8] == group_by[8].max()]
-        return units[[8]]
+    return units
+
+# def show_desired_units(how):
+#
+#     ## Filter accordingly
+#     if how == 'win':
+#         units = group_by.sort_values(by='score', ascending=False)[:count]
+#         return units[['score']]
+#     elif how == 'first':
+#         units = group_by[group_by[1] == group_by[1].max()]
+#         return units[[1]]
+#     elif how == 'lose':
+#         units = group_by.sort_values(by='score', ascending=True)[:count]
+#         return units[['score']]
+#     elif how == 'eighth':
+#         units = group_by.loc[group_by[8] == group_by[8].max()]
+#         return units[[8]]
 
 ## load data function
 def load_data(region, name, count, watcher):
