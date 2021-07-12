@@ -279,7 +279,7 @@ def by_league():
     ## Show desired data
     if st.session_state.submitted:
         data_options = [
-    #            'End of Match Data',
+#           'End of Match Data',
             'Winning Units',
             'Losing Units',
             'First Place Units',
@@ -300,7 +300,7 @@ def by_league():
             ## Winning Units
             if select == data_options[0]:
                 df = get_units_data(data,False)
-                units = score_units(df, n_units)
+                units = score_units(df)
                 st.write(
                 'These are the top ' +
                 str(n_units) +
