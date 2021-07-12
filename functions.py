@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 import riotwatcher
 import json
+from sklearn.preprocessing import MultiLabelBinarizer
 
 ## For data option 0: End of match data
 def get_endings_dataframe(data, only):
@@ -318,7 +319,13 @@ def get_items_dataframe(df):
     '''
     ## Get unique item lists, coded
     unique_items = df.explode('items')['items'].unique()
-    item_bools = boolean_df(df.set_index('character_id')['items'], unique_items)
+    ## Save character_id index for joining later
+    unit_index = df['character_id']
+    mlb = MultiLabelBinarizer(classes=unique_items)
+    mlb_object = mlb.fit_transform(df.set_index('character_id')['items'])
+    mlb_columns = pd.DataFrame(mlb.classes_).transpose().to_dict('records')[0]
+    item_frame = pd.DataFrame(mlb_object).rename(columns=mlb_columns)
+    #item_bools = boolean_df(df.set_index('character_id')['items'], unique_items)
     ## Get corresponding item names from static data
     with open('set5/items.json', 'r') as f:
         static_items = json.load(f)
@@ -326,9 +333,10 @@ def get_items_dataframe(df):
     for item in static_items:
         item_dict[item['id']] = item['name']
     ## Rename columns
-    item_bools = item_bools.rename(columns=item_dict)
+    item_frame = item_frame.rename(columns=item_dict).set_index(unit_index)
     ## Attach match id and placement for joining later
-    df = item_bools.join(df.set_index('character_id')[['match_id','placement']])
+    #df = item_frame.join(df.set_index('character_id')[['match_id','placement']])
+    df = item_frame
     return df
 
 def boolean_df(item_lists, unique_items):

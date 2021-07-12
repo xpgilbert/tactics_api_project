@@ -22,7 +22,7 @@ def main():
         distribution of our placements.  Place make sure your api key
         exists in the directory above this python file in a file called
         *apikey.txt*.
-        * Libraries used: os, pandas, json (developement only),
+        * Libraries used: os, pandas, json,
         [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/),
         [streamlit](https://streamlit.io/).
         * Riot API can be found [here](https://developer.riotgames.com/)
@@ -61,7 +61,6 @@ def by_summoner():
     ## Start page with only form to start riotwatcher.TftWatcher
     if 'submitted' not in st.session_state:
         st.session_state.submitted = False
-
     ## Initial fields
     with st.form('Load Summoner Data'):
         name = st.text_input('Enter Summoner Name', key='name')
@@ -263,10 +262,6 @@ def by_league():
         if st.button('Write json'):
             with open('summoners_test.json', 'w') as outfile:
                 json.dump(st.session_state.data, outfile)
-
-
-
-
 #################################################
     ## For testing, load json file
     ## REMOVE THIS
@@ -274,6 +269,7 @@ def by_league():
     if st.button('Load json'):
         with open('summoners_test.json') as f:
             data = json.load(f)
+            st.session_state.data = data
         st.session_state.submitted = True
 #################################################
     ## Show desired data
@@ -307,17 +303,45 @@ def by_league():
                 ' winning units from the last ' +
                 str(count) +
                 ' games:')
-                st.write(units[:n_units][['score']])
+                #st.write(units[:n_units][['score']])
                 if raw_data:
                     st.write('Raw Data:')
                     cols = df.columns.tolist()
-                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = [x for x in cols if x not in ['character_id']]
                     cols = ['character_id'] + cols
                     df = df[cols]
-                    st.write(df.drop(['e', 'name'], axis=1))
+                    st.write(df.drop(['e', 'name'], axis=1).shape)
                     st.write('Placements by All Units: ')
-                    st.write(units)
-
+                    #st.write(units)
+        if st.button('Send it'):
+            data=st.session_state.data
+            df = get_units_data(data, False)
+            items = get_items_dataframe(df)
+            items.reset_index(drop=True, inplace=True)
+            units = score_units(df)
+            df = df.drop(['items', 'name', 'e'], axis=1)
+            df.reset_index(drop=True, inplace=True)
+            df = pd.concat([df, items], axis=1)
+            placement_dummines = pd.get_dummies(df['placement'])
+            df = pd.concat([df, placement_dummines], axis=1)
+            #df = df.drop(['placement'], axis=1)
+            for col in df.columns:
+                if col not in ['character_id', 'match_id']:
+                    df.loc['max', col] = df[col].astype(float).max()
+            st.write(df.groupby(['character_id', 'placement', 'match_id']).sum().shape)
+            st.write(df.shape)
+            if raw_data:
+                st.write('Raw Data:')
+                cols = df.columns.tolist()
+                cols = [x for x in cols if x not in ['character_id']]
+                cols = ['character_id'] + cols
+                df = df[cols]
+                st.write(df.drop(['e', 'name'], axis=1))
+                # st.write('Placements by All Units: ')
+                # st.write(units)
+                # st.write(units.shape)
+        if st.button('quick show'):
+            st.write('nothing to show')
 ########################################################################
 ########################################################################
 ########################################################################
