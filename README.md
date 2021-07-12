@@ -13,7 +13,7 @@ The potential product is being explored as a streamlit app using machine learnin
 * find a good way to score unit performance in a match and over a sequence of matches
 
 Sources and Libraries:
-* Libraries used include: os, pandas, [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/), [streamlit](https://streamlit.io/)
+* Libraries used include: os, pandas, sklearn, [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/), [streamlit](https://streamlit.io/)
 * Riot API can be found [here](https://developer.riotgames.com/)
 
 THIS REPO IS INTENDED FOR PRIVATE EXPLORATION OF THE RIOT API.
