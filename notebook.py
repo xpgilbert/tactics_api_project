@@ -35,21 +35,14 @@ if st.button('rewrite json'):
             json.dump(summoners, outfile)
 
 ## For testing, load json file
-with open('summoners_test.json') as f:
-    summoners = json.load(f)
-
+if st.button('Load Json'):
+    with open('summoners_test.json') as f:
+        summoners = json.load(f)
 ## Find all unique matches:
 unique_ids = []
 unique_matches = {}
-for summoner in summoners.values():
-    for match in summoner.values():
-        match_id = match['metadata']['match_id']
-        if match_id not in unique_ids:
-            unique_ids.append(match_id)
-            unique_matches[match_id] = match
 ## get all units and placements from every unique match
-data = {'matches':unique_matches, 'match_ids':unique_ids}
-df = get_units_data(data, only=False)
+df = get_units_data(summoners, only=False)
 df = score_units(df)
 st.write(df)
 

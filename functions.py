@@ -3,6 +3,7 @@
 import pandas as pd
 import streamlit as st
 import riotwatcher
+import json
 
 ## For data option 0: End of match data
 def get_endings_dataframe(data, only):
@@ -201,7 +202,7 @@ def load_summoner_data(region, name, count, watcher):
         match_ids: list of match ids
         matches: dictionary of match data with match_ids as keys
     '''
-    ## Some Riot API needs platform, not region.  I dont know why
+    ## Some Riot API needs platform, not region
     if region == 'na1':
         platform = 'americas'
     ## Find puuid for named summoner
@@ -298,6 +299,50 @@ def load_league_data(region, queue, name, count, watcher):
         'matches':unique_matches
     }
     return data
+
+def get_items_dataframe(df):
+    '''
+    Creates a boolean dataframe with information on items used by each
+    unit in each match.  Links to the static data which must be stored
+    in a folder called 'set5'. This must be renamed from 'set5patchXXXX'
+    and lives in the same directory as this functions.py file.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        dataframe from get_units_data(dict, only = False)
+    Returns
+    -------
+    data : pandas DataFrame
+        boolean dataframe of
+    '''
+    ## Get unique item lists, coded
+    unique_items = df.explode('items')['items'].unique()
+    item_bools = boolean_df(df.set_index('character_id')['items'], unique_items)
+    ## Get corresponding item names from static data
+    with open('set5/items.json', 'r') as f:
+        static_items = json.load(f)
+    item_dict = {float('nan'):'no_items'}
+    for item in static_items:
+        item_dict[item['id']] = item['name']
+    ## Rename columns
+    item_bools = item_bools.rename(columns=item_dict)
+    ## Attach match id and placement for joining later
+    df = item_bools.join(df.set_index('character_id')[['match_id','placement']])
+    return df
+
+def boolean_df(item_lists, unique_items):
+    '''
+    source: https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173
+    '''
+    # Create empty dict
+    bool_dict = {}
+    # Loop through all the tags
+    for i, item in enumerate(unique_items):
+        # Apply boolean mask
+        bool_dict[item] = item_lists.apply(lambda x: item in x)
+    # Return the results as a dataframe
+    return pd.DataFrame(bool_dict)
 
 def get_api_key():
     f = open('../apikey.txt', 'r')
