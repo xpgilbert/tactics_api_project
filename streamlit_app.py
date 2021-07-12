@@ -289,7 +289,7 @@ def by_league():
                 min_value=1,
                 max_value=10,
                 value=3)
-            raw_data = st.checkbox('Show raw data', key='raw_data')
+        raw_data = st.checkbox('Show raw data', key='raw_data')
         show_data = st.button('Show Data')
         if show_data:
             data = st.session_state.data
@@ -381,7 +381,7 @@ def by_league():
                     st.write(units.sort_values(by='score', ascending=True))
                     st.write(units)
             ## Machine Learning Prep
-            elif select == data_options[5]:
+            elif select == data_options[4]:
                 data=st.session_state.data
                 df = collect_units_items(data)
                 grouped = df.groupby(['character_id', 'placement', 'match_id']).sum()
@@ -395,9 +395,8 @@ def by_league():
                     cols = [x for x in cols if x not in ['character_id']]
                     cols = ['character_id'] + cols
                     df = df[cols]
-                    st.write(df.drop(['e', 'name'], axis=1))
-                    st.write('Placements by All Units: ')
-                    st.write(units)
+                    st.write(df)
+
         if st.button('quick show'):
             st.write('nothing to show')
 ########################################################################

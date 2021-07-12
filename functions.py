@@ -364,7 +364,7 @@ def collect_units_items(data):
     placement_dummines = pd.get_dummies(units['placement'])
     ## Concat all the frames
     df = pd.concat([units, placement_dummines, items], axis=1)
-    return df.drop('placement', axis=1)
+    return df
 
 def get_api_key():
     f = open('../apikey.txt', 'r')
@@ -379,13 +379,3 @@ def findParticipant(match, puuid):
         participant = match['info']['participants'][i]
         if puuid == participant['puuid']:
             return participant
-            #
-            # items = get_items_data(df)
-            # items.reset_index(drop=True, inplace=True)
-            # units = score_units(df)
-            # #df = df.drop(['items', 'name', 'e'], axis=1)
-            # df.reset_index(drop=True, inplace=True)
-            # df = pd.concat([df, items], axis=1)
-            # placement_dummines = pd.get_dummies(df['placement'])
-            # df = pd.concat([df, placement_dummines], axis=1)
-            # #df = df.drop(['placement'], axis=1)
