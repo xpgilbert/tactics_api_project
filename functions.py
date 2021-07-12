@@ -301,7 +301,7 @@ def load_league_data(region, queue, name, count, watcher):
     }
     return data
 
-def get_items_dataframe(df):
+def get_items_data(df):
     '''
     Creates a boolean dataframe with information on items used by each
     unit in each match.  Links to the static data which must be stored
@@ -339,18 +339,32 @@ def get_items_dataframe(df):
     df = item_frame
     return df
 
-def boolean_df(item_lists, unique_items):
+def collect_units_items(data):
     '''
-    source: https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173
+    Get a large dataframe for modeling.  Mix of continuous and binary
+    variables, including dummy variables from pandas.
+    Parameters
+    ----------
+    data : dict
+        dict loaded from st.session_state.data
+    Returns
+    -------
+    df : pandas dataframe
+        Every unit and their items as dummies for every match in dataset
     '''
-    # Create empty dict
-    bool_dict = {}
-    # Loop through all the tags
-    for i, item in enumerate(unique_items):
-        # Apply boolean mask
-        bool_dict[item] = item_lists.apply(lambda x: item in x)
-    # Return the results as a dataframe
-    return pd.DataFrame(bool_dict)
+    ## Get units dataframe from data
+    units = get_units_data(data, False)
+    ## Get items dataframe from data
+    items = get_items_data(units)
+    ## Remove unecessary columns and reset indeces
+    units = units.drop(['items', 'name', 'e'], axis=1)
+    units.reset_index(drop=True, inplace=True)
+    items.reset_index(drop=True, inplace=True)
+    ## Get placement dummies
+    placement_dummines = pd.get_dummies(units['placement'])
+    ## Concat all the frames
+    df = pd.concat([units, placement_dummines, items], axis=1)
+    return df.drop('placement', axis=1)
 
 def get_api_key():
     f = open('../apikey.txt', 'r')
@@ -365,3 +379,13 @@ def findParticipant(match, puuid):
         participant = match['info']['participants'][i]
         if puuid == participant['puuid']:
             return participant
+            #
+            # items = get_items_data(df)
+            # items.reset_index(drop=True, inplace=True)
+            # units = score_units(df)
+            # #df = df.drop(['items', 'name', 'e'], axis=1)
+            # df.reset_index(drop=True, inplace=True)
+            # df = pd.concat([df, items], axis=1)
+            # placement_dummines = pd.get_dummies(df['placement'])
+            # df = pd.concat([df, placement_dummines], axis=1)
+            # #df = df.drop(['placement'], axis=1)

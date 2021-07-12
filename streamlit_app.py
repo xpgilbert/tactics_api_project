@@ -22,7 +22,7 @@ def main():
         distribution of our placements.  Place make sure your api key
         exists in the directory above this python file in a file called
         *apikey.txt*.
-        * Libraries used: os, pandas, json,
+        * Libraries used: os, pandas, json, sklearn,
         [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/),
         [streamlit](https://streamlit.io/).
         * Riot API can be found [here](https://developer.riotgames.com/)
@@ -275,15 +275,14 @@ def by_league():
     ## Show desired data
     if st.session_state.submitted:
         data_options = [
-#           'End of Match Data',
             'Winning Units',
             'Losing Units',
             'First Place Units',
-            'Eighth Place Units'
+            'Eighth Place Units',
+            'Machine Learning'
             ]
         select = st.selectbox('Select what data to show', data_options)
-        show_data = st.button('Show Data')
-        if select in data_options:
+        if select in data_options[:4]:
             n_units = st.number_input(
                 'How many units',
                 key='unit_count',
@@ -291,6 +290,7 @@ def by_league():
                 max_value=10,
                 value=3)
             raw_data = st.checkbox('Show raw data', key='raw_data')
+        show_data = st.button('Show Data')
         if show_data:
             data = st.session_state.data
             ## Winning Units
@@ -303,43 +303,101 @@ def by_league():
                 ' winning units from the last ' +
                 str(count) +
                 ' games:')
-                #st.write(units[:n_units][['score']])
+                st.write(units[:n_units][['score']])
                 if raw_data:
                     st.write('Raw Data:')
                     cols = df.columns.tolist()
                     cols = [x for x in cols if x not in ['character_id']]
                     cols = ['character_id'] + cols
                     df = df[cols]
-                    st.write(df.drop(['e', 'name'], axis=1).shape)
+                    st.write(df.drop(['e', 'name'], axis=1))
                     st.write('Placements by All Units: ')
-                    #st.write(units)
-        if st.button('Send it'):
-            data=st.session_state.data
-            df = get_units_data(data, False)
-            items = get_items_dataframe(df)
-            items.reset_index(drop=True, inplace=True)
-            units = score_units(df)
-            df = df.drop(['items', 'name', 'e'], axis=1)
-            df.reset_index(drop=True, inplace=True)
-            df = pd.concat([df, items], axis=1)
-            placement_dummines = pd.get_dummies(df['placement'])
-            df = pd.concat([df, placement_dummines], axis=1)
-            #df = df.drop(['placement'], axis=1)
-            for col in df.columns:
-                if col not in ['character_id', 'match_id']:
-                    df.loc['max', col] = df[col].astype(float).max()
-            st.write(df.groupby(['character_id', 'placement', 'match_id']).sum().shape)
-            st.write(df.shape)
-            if raw_data:
-                st.write('Raw Data:')
-                cols = df.columns.tolist()
-                cols = [x for x in cols if x not in ['character_id']]
-                cols = ['character_id'] + cols
-                df = df[cols]
-                st.write(df.drop(['e', 'name'], axis=1))
-                # st.write('Placements by All Units: ')
-                # st.write(units)
-                # st.write(units.shape)
+                    st.write(units)
+            ## Losing Units
+            elif select == data_options[1]:
+                df = get_units_data(data,False)
+                units = score_units(df)
+                st.write(
+                    'These are the worst ' +
+                    str(n_units) +
+                    ' losing units from the last ' +
+                    str(count) +
+                    ' games:')
+                st.write(units.sort_values(by='score', ascending=True)[:n_units][['score']])
+                if raw_data:
+                    st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id'] + cols
+                    df = df[cols]
+                    st.write(df.drop(['e', 'name'], axis=1))
+                    st.write('Placements by All Units: ')
+                    st.write(units.sort_values(by='score', ascending=True))
+            ## First Place Units
+            elif select == data_options[2]:
+                df = get_units_data(data,False)
+                units = score_units(df)
+                if 1 not in units.columns.tolist():
+                    error = 'ERROR: no units got first place in this search'
+                    return st.write(error)
+                st.write(
+                    'These are the ' +
+                    str(n_units) +
+                    ' units that placed first most often in the last ' +
+                    str(count) +
+                    ' games:')
+                st.write(units.sort_values(by=1, ascending=False)[:n_units][[1]])
+                if raw_data:
+                    st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id'] + cols
+                    df = df[cols]
+                    st.write(df.drop(['e', 'name'], axis=1))
+                    st.write('Placements by All Units: ')
+                    st.write(units)
+            ## Eighth Place Units
+            elif select == data_options[3]:
+                df = get_units_data(data,False)
+                units = score_units(df)
+                if 8 not in units.columns.tolist():
+                    error = 'ERROR: no units got eighth place in this search'
+                    return st.write(error)
+                st.write(
+                    'These are the ' +
+                    str(n_units) +
+                    ' units that placed eighth most often in the last ' +
+                    str(count) +
+                    ' games:')
+                st.write(units.sort_values(by=8, ascending=False)[:n_units][[8]])
+                if raw_data:
+                    st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id', 'placement']]
+                    cols = ['character_id'] + cols
+                    df = df[cols]
+                    st.write(df.drop(['e', 'name'], axis=1))
+                    st.write('Placements by All Units: ')
+                    st.write(units.sort_values(by='score', ascending=True))
+                    st.write(units)
+            ## Machine Learning Prep
+            elif select == data_options[5]:
+                data=st.session_state.data
+                df = collect_units_items(data)
+                grouped = df.groupby(['character_id', 'placement', 'match_id']).sum()
+                for col in grouped.columns:
+                    grouped.loc['max', col] = df[col].astype(float).max()
+                st.write(grouped.shape)
+                st.write(df)
+                if raw_data:
+                    st.write('Raw Data:')
+                    cols = df.columns.tolist()
+                    cols = [x for x in cols if x not in ['character_id']]
+                    cols = ['character_id'] + cols
+                    df = df[cols]
+                    st.write(df.drop(['e', 'name'], axis=1))
+                    st.write('Placements by All Units: ')
+                    st.write(units)
         if st.button('quick show'):
             st.write('nothing to show')
 ########################################################################
