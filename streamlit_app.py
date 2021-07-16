@@ -133,8 +133,8 @@ def by_summoner():
                 st.write(df)
             ## Winning Units
             elif select == data_options[1]:
-                df = get_units_data(data,only)
-                units = score_units(df, n_units)
+                df = get_units_data(data, only)
+                units = score_units(df)
                 st.write(
                 'These are the top ' +
                 str(n_units) +
@@ -154,7 +154,7 @@ def by_summoner():
             ## Losing Units
             elif select == data_options[2]:
                 df = get_units_data(data,only)
-                units = score_units(df, n_units)
+                units = score_units(df)
                 st.write(
                     'These are the worst ' +
                     str(n_units) +
@@ -174,7 +174,7 @@ def by_summoner():
             ## First Place Units
             elif select == data_options[3]:
                 df = get_units_data(data,only)
-                units = score_units(df, n_units)
+                units = score_units(df)
                 if 1 not in units.columns.tolist():
                     error = 'ERROR: no units got first place in this search'
                     return st.write(error)
@@ -197,7 +197,7 @@ def by_summoner():
             ## Eighth Place Units
             elif select == data_options[4]:
                 df = get_units_data(data,only)
-                units = score_units(df, n_units)
+                units = score_units(df)
                 if 8 not in units.columns.tolist():
                     error = 'ERROR: no units got eighth place in this search'
                     return st.write(error)
@@ -384,10 +384,13 @@ def by_league():
             elif select == data_options[4]:
                 data=st.session_state.data
                 df = collect_units_items(data)
-                grouped = df.groupby(['character_id', 'placement', 'match_id']).sum()
-                for col in grouped.columns:
-                    grouped.loc['max', col] = df[col].astype(float).max()
-                st.write(grouped.shape)
+                if "df" not in st.session_state:
+                    st.session_state.df = df
+                # grouped = df.groupby(['character_id', 'placement', 'match_id']).sum()
+                # for col in grouped.columns:
+                #     grouped.loc['max', col] = df[col].astype(float).max()
+                # st.write(grouped.shape)
+                df['target'] = (df['placement']<=4)
                 st.write(df)
                 if raw_data:
                     st.write('Raw Data:')
@@ -396,6 +399,10 @@ def by_league():
                     cols = ['character_id'] + cols
                     df = df[cols]
                     st.write(df)
+                ml_model_time()
+
+def ml_model_time():
+
 
         if st.button('quick show'):
             st.write('nothing to show')
