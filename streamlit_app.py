@@ -55,7 +55,6 @@ def main():
 ########################################################################
 ########################################################################
 ########################################################################
-
 ## By summoner
 def by_summoner():
     ## Start page with only form to start riotwatcher.TftWatcher
@@ -161,7 +160,7 @@ def by_summoner():
                     ' losing units from the last ' +
                     str(count) +
                     ' games:')
-                st.write(units.sort_values(by='score', ascending=True)[:n_units][['score']])
+                st.write(units.sort_values(by='score')[:n_units][['score']])
                 if raw_data:
                     st.write('Raw Data:')
                     cols = df.columns.tolist()
@@ -217,7 +216,6 @@ def by_summoner():
                     st.write(df.drop(['e', 'name'], axis=1))
                     st.write('Placements by All Units: ')
                     st.write(units.sort_values(by='score', ascending=True))
-
 ## By league
 def by_league():
     ## Start page with only form to start riotwatcher.TftWatcher
@@ -323,7 +321,7 @@ def by_league():
                     ' losing units from the last ' +
                     str(count) +
                     ' games:')
-                st.write(units.sort_values(by='score', ascending=True)[:n_units][['score']])
+                st.write(units.sort_values(by='score')[:n_units][['score']])
                 if raw_data:
                     st.write('Raw Data:')
                     cols = df.columns.tolist()
@@ -401,11 +399,11 @@ def by_league():
                     st.write(df)
                 ml_model_time()
 
-def ml_model_time():
-
-
-        if st.button('quick show'):
-            st.write('nothing to show')
+# def ml_model_time():
+#
+#
+#         if st.button('quick show'):
+#             st.write('nothing to show')
 ########################################################################
 ########################################################################
 ########################################################################

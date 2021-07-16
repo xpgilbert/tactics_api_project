@@ -40,9 +40,7 @@ def get_endings_dataframe(data, only):
     ## Check if only interested in requested summoner
     if only == True:
         df = df[df['puuid']==data['puuid']]
-#        df = df.drop('puuid', axis=1)
     return df
-## For data options 1:5: Units data
 def get_units_data(data, only):
     '''
     Build dataframe of unit data for further analysis.
@@ -66,7 +64,7 @@ def get_units_data(data, only):
         id = data['match_ids'][i]
     ## Only interested in named summoner
         if only == True:
-            participant = findParticipant(data['matches'][id], data['puuid'])
+            participant = find_participant(data['matches'][id], data['puuid'])
             temp_df = pd.json_normalize(participant['units'])
             temp_df['placement'] = participant['placement']
             temp_df['match_id'] = id
@@ -82,7 +80,6 @@ def get_units_data(data, only):
     ## Counter column
     df['e'] = 1
     return df
-
 def score_units(data):
     '''
     Get the units by desired filter method and return dataframe with
@@ -158,24 +155,6 @@ def score_units(data):
     if len(undefeated) != 0:
         st.write('These units did not lose a game:', undefeated)
     return units
-
-# def show_desired_units(how):
-#
-#     ## Filter accordingly
-#     if how == 'win':
-#         units = group_by.sort_values(by='score', ascending=False)[:count]
-#         return units[['score']]
-#     elif how == 'first':
-#         units = group_by[group_by[1] == group_by[1].max()]
-#         return units[[1]]
-#     elif how == 'lose':
-#         units = group_by.sort_values(by='score', ascending=True)[:count]
-#         return units[['score']]
-#     elif how == 'eighth':
-#         units = group_by.loc[group_by[8] == group_by[8].max()]
-#         return units[[8]]
-
-## load data function
 def load_summoner_data(region, name, count, watcher):
     '''
     Requests the data from Riot API using riotwatcher and creates a
@@ -225,7 +204,6 @@ def load_summoner_data(region, name, count, watcher):
     'matches':matches
     }
     return data
-
 def load_league_data(region, queue, name, count, watcher):
     '''
     Requests the data from Riot API using riotwatcher and creates a
@@ -300,7 +278,6 @@ def load_league_data(region, queue, name, count, watcher):
         'matches':unique_matches
     }
     return data
-
 def get_items_data(df):
     '''
     Creates a boolean dataframe with information on items used by each
@@ -338,7 +315,6 @@ def get_items_data(df):
     #df = item_frame.join(df.set_index('character_id')[['match_id','placement']])
     df = item_frame
     return df
-
 def collect_units_items(data):
     '''
     Get a large dataframe for modeling.  Mix of continuous and binary
@@ -346,7 +322,7 @@ def collect_units_items(data):
     Parameters
     ----------
     data : dict
-        dict loaded from st.session_state.data
+        Dictionary loaded from st.session_state.data
     Returns
     -------
     df : pandas dataframe
@@ -361,16 +337,14 @@ def collect_units_items(data):
     units.reset_index(drop=True, inplace=True)
     items.reset_index(drop=True, inplace=True)
     ## Get placement dummies
-    placement_dummines = pd.get_dummies(units['placement'])
+    placement_dummies = pd.get_dummies(units['placement'])
     ## Concat all the frames
-    df = pd.concat([units, placement_dummines, items], axis=1)
+    df = pd.concat([units, placement_dummies, items], axis=1)
     return df
-
 def get_api_key():
     f = open('../apikey.txt', 'r')
     return f.read()
-
-def findParticipant(match, puuid):
+def find_participant(match, puuid):
     '''
     function to find specific participant by puuid in a single match
     used in other function calls
