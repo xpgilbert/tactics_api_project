@@ -27,20 +27,22 @@ def main():
         * Riot API can be found [here](https://developer.riotgames.com/)
     ''')
     ## Check for apikey.txt file
-    if not path.exists('../apikey.txt'):
-        with st.form('apikey_file'):
-            st.markdown('''
-                *You do not have an apikey.txt file in the directory
-                above this app.  Please either use this widget to create
-                one or add it manually.  Then refresh this page.*
-            ''')
-
-            apikey = st.text_input('Enter API Key', type = 'password')
-            if st.form_submit_button('Write apikey.txt file'):
-                with open('../apikey.txt', 'w') as f:
-                    f.write(apikey)
-        apikey = 0
-        st.stop()
+    if not st.secrets('apikey'):
+        st.write('There is not an apikey in the streamlit secrets.')
+    # if not path.exists('../apikey.txt'):
+    #     with st.form('apikey_file'):
+    #         st.markdown('''
+    #             *You do not have an apikey.txt file in the directory
+    #             above this app.  Please either use this widget to create
+    #             one or add it manually.  Then refresh this page.*
+    #         ''')
+    #
+    #         apikey = st.text_input('Enter API Key', type = 'password')
+    #         if st.form_submit_button('Write apikey.txt file'):
+    #             with open('../apikey.txt', 'w') as f:
+    #                 f.write(apikey)
+    #     apikey = 0
+    #     st.stop()
     ## Select from sideback
     explore_options = ['Summoner Data','League Data']
     exploring = st.sidebar.radio(
