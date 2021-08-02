@@ -1,5 +1,3 @@
-#### tactics_api_project
-
 # TFT and Data Science
 ## Exploration of Machine Learning, Analytics, and Visualizations Using the Riot API
 
