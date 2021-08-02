@@ -15,5 +15,3 @@ The potential product is being explored as a streamlit app using machine learnin
 Sources and Libraries:
 * Libraries used include: os, pandas, sklearn, [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/), [streamlit](https://streamlit.io/)
 * Riot API can be found [here](https://developer.riotgames.com/)
-
-THIS REPO IS INTENDED FOR PRIVATE EXPLORATION OF THE RIOT API.
