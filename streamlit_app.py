@@ -18,9 +18,7 @@ def main():
     st.title('TFT API Exercise')
     st.markdown('''
         This streamlit app helps tft players find their best and worst
-        units. Place make sure your api key
-        exists in the directory above this python file in a file called
-        *apikey.txt*.
+        units.  The github link can be found [here](https://github.com/xpgilbert/tactics_api_project/)
         * Libraries used: os, pandas, json, sklearn,
         [riotwatcher](https://riot-watcher.readthedocs.io/en/latest/),
         [streamlit](https://streamlit.io/).
