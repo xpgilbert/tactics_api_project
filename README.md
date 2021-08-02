@@ -1,7 +1,7 @@
 # TFT and Data Science
 ## Exploration of Machine Learning, Analytics, and Visualizations Using the Riot API
 
-The potential product is being explored as a streamlit app using machine learning libraries to help players better understand their performance and update their strategies.  Intended for a small, personal audience.
+The product is being explored as a streamlit app using machine learning libraries to help players better understand their performance and update their strategies.  Intended for a small, personal audience.
 
 The link for the streamlit app is [https://share.streamlit.io/xpgilbert/tactics_api_project](https://share.streamlit.io/xpgilbert/tactics_api_project).
 
