@@ -27,8 +27,8 @@ def main():
         * Riot API can be found [here](https://developer.riotgames.com/)
     ''')
     ## Check for apikey.txt file
-    if not st.secrets('apikey'):
-        st.write('There is not an apikey in the streamlit secrets.')
+    # if not st.secrets('apikey'):
+    #     st.write('There is not an apikey in the streamlit secrets.')
     # if not path.exists('../apikey.txt'):
     #     with st.form('apikey_file'):
     #         st.markdown('''
