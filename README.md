@@ -1,4 +1,4 @@
-# TFT and Data Science
+# Team Fight Tactics and Data Science
 ## Exploration of Machine Learning, Analytics, and Visualizations Using the Riot API
 
 The product is being explored as a streamlit app using machine learning libraries to help players better understand their performance and update their strategies.  Intended for a small, personal audience.
