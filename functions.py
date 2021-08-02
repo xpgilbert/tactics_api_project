@@ -346,7 +346,8 @@ def collect_units_items(data):
 def get_api_key():
     # f = open('../apikey.txt', 'r')
     # return f.read()
-    return st.secrets('apikey')
+    apikey = st.secrets['apikey']
+    return apikey
 def find_participant(match, puuid):
     '''
     function to find specific participant by puuid in a single match
