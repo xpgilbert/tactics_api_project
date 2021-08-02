@@ -18,8 +18,7 @@ def main():
     st.title('TFT API Exercise')
     st.markdown('''
         This streamlit app helps tft players find their best and worst
-        units. We can also request basic visualizations about the
-        distribution of our placements.  Place make sure your api key
+        units. Place make sure your api key
         exists in the directory above this python file in a file called
         *apikey.txt*.
         * Libraries used: os, pandas, json, sklearn,
@@ -62,6 +61,10 @@ def by_summoner():
         st.session_state.submitted = False
     ## Initial fields
     with st.form('Load Summoner Data'):
+        st.markdown('''
+        We can explore individual summoner data in this section
+        of the app.  This analyzes across all queue types.
+        ''')
         name = st.text_input('Enter Summoner Name', key='name')
         region = st.selectbox(
             'Select region',
@@ -218,15 +221,23 @@ def by_summoner():
                     st.write(units.sort_values(by='score', ascending=True))
 ## By league
 def by_league():
+
     ## Start page with only form to start riotwatcher.TftWatcher
     if 'submitted' not in st.session_state:
         st.session_state.submitted = False
     with st.form('Initialize league data'):
+        st.markdown('''
+        We can explore ranked league data in this section
+        of the app.  Hyper Roll functionality will be added later. You
+        have the option to save the loaded league data as a json to
+        analyze later without having to reload the data from the API
+        every time.
+        ''')
         name = st.text_input('Enter Summoner Name', key='name')
-        queue = st.selectbox(
-            label='Queue Type',
-            options=['Ranked','Hyper Roll']
-            )
+        # queue = st.selectbox(
+        #     label='Queue Type',
+        #     options=['Ranked','Hyper Roll']
+        #     )
         region = st.selectbox(
             'Select region',
             ['na1', 'eu'],
@@ -238,14 +249,14 @@ def by_league():
             max_value=20,
             value=2
             )
-        queue = ['RANKED_TFT', 'RANKED_TFT_TURBO'][['Ranked', 'Hyper Roll'].index(queue)]
+        # queue = ['RANKED_TFT', 'RANKED_TFT_TURBO'][['Ranked', 'Hyper Roll'].index(queue)]
         submit = st.form_submit_button('Request League Data')
         if submit:
             st.session_state.submitted = True
             watcher = riotwatcher.TftWatcher(api_key=get_api_key())
             if 'watcher' not in st.session_state:
                 st.session_state.watcher = watcher
-            data = load_league_data(region, queue, name, count, watcher)
+            data = load_league_data(region, name, count, watcher)
             st.session_state.data = data
             if type(len(st.session_state.data['match_ids']))==int:
                 st.write('Loaded '

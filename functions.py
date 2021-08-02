@@ -204,7 +204,7 @@ def load_summoner_data(region, name, count, watcher):
     'matches':matches
     }
     return data
-def load_league_data(region, queue, name, count, watcher):
+def load_league_data(region, name, count, watcher):
     '''
     Requests the data from Riot API using riotwatcher and creates a
     dictionary of the relevant id information and league data to be used
@@ -214,13 +214,13 @@ def load_league_data(region, queue, name, count, watcher):
     ----------
     region : str
         summoner region to query
-    queue : str
-        which game mode to query, either Ranked or Hyper Roll.
+    # queue : str
+    #     which game mode to query, either Ranked or Hyper Roll.
     name : str
         if only interested in the named summoner
     count : int
         number of matches per summoner to return
-    watcher : riotwatcher class, optional
+    watcher : riotwatcher class
         watcher class from riotwatcher to interface Riot API
     Returns
     -------
@@ -237,8 +237,10 @@ def load_league_data(region, queue, name, count, watcher):
     sum_id = watcher.summoner.by_name(region, name)['id']
     ## Get desired queue and coresponding league_id
     for league in watcher.league.by_summoner(region, sum_id):
-        if league['queueType'] == queue:
+        if league['queueType'] == 'RANKED_TFT':
             league_id = league['leagueId']
+        # else:
+        #     league_id = 'hyper_roll'
     ## Get League API data
     league_data = watcher.league.by_id(region, league_id)
     league_name = league_data['name']
@@ -272,7 +274,7 @@ def load_league_data(region, queue, name, count, watcher):
         'name':league_name,
         'tier':league_tier,
         'region':region,
-        'queue':queue,
+        # 'queue':queue,
         'summoner_id':sum_id,
         'match_ids':unique_ids,
         'matches':unique_matches
